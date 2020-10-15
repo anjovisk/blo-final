@@ -1,0 +1,76 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Votação</title>
+  <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body class="container">
+  <div id="chairperson-area" style="display: none;">
+    <div class="table-responsive">
+      <h1>Eleitores</h1>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Eleitor</th>
+            <th>Votou</th>
+            <th>Delegou</th>
+          </tr>
+        </thead>
+        <tbody id="table-voters-body">
+        </tbody>
+      </table>
+    </div>
+    <div id="winner-div" style="display: none;">
+      <h1>Vencedor:<span id="winner-span"></span></h1>
+    </div>
+    <h1>Candidatos</h1>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Candidato</th>
+            <th>Votos</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+        </tbody>
+      </table>
+    </div>
+    <form id="add-proposal-form">
+      <label for="add-proposal-input">Adicionar candidato:</label>
+      <input type="text" id="add-proposal-input" name="proposal"></input>
+      <button type="button" class="btn btn-primary" id="btn-add-proposal">Adicionar</button>
+    </form>
+    <form>
+      <label for="add-voter-address-input">Endereço:</label>
+      <input type="text" id="add-voter-address-input" name="voterAddress"></input>
+      <label for="add-voter-name-input">Nome:</label>
+      <input type="text" id="add-voter-name-input" name="voterName"></input>
+      <button type="button" class="btn btn-primary" id="btn-add-voter">Conceder direito a voto</button>
+    </form>
+    <div>
+      <button type="button" class="btn btn-primary" id="btn-close-voting">Encerrar votação</button>
+    </div>
+  </div>
+  <div id="voter-area" style="display: none;">
+    <div>
+      <span id="voter-name-span"></span>
+      <span id="voter-status-span"></span>
+    </div>
+    <form id="delegate-vote-form" style="display: none;">
+      <label for="delegate-vote-input">Endereço:</label>
+      <input type="text" id="delegate-vote-input" name="voterAddress"></input>
+      <button type="button" class="btn btn-primary" id="btn-delegate-vote">Delegar voto</button>
+    </form>
+    <form id="vote-form" style="display: none;">
+      <select id="candidate-options" name="candidate"></select>
+      <button type="button" class="btn btn-primary" id="btnVote">Votar</button>
+    </form>
+  </div>
+</body>
+<script charset="utf-8" src="https://cdn.ethers.io/scripts/ethers-v4.min.js" type="text/javascript"> </script>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script src="./js/VotingAbi.js"></script>
+<script src="./js/app.js"></script>
+</html>
