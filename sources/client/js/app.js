@@ -208,9 +208,8 @@ $(document).ready(async function() {
 		candidato = $("#candidate-options").children("option:selected").val();
 
 		eleicao.methods.vote(candidato).send({from: myAddress})
-			.on('receipt',function(receipt) {
-				//getCandidatos(eleicao, populaCandidatos);
-				windows.location.reaload(true);
+			.on('confirmation', function(confNumber, receipt, latestBlockHash) {
+				location.reload();
 			})
 			.on('error',function(error) {
 				alert(error.message);
