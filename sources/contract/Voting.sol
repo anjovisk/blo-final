@@ -24,13 +24,13 @@ contract Voting {
     address public chairperson;
 
     //Lista de eleitores (estrutura Voter)
-    mapping(address => Voter) public voters;
+    mapping(address => Voter) private voters;
 
     //Lista de candidatos
-    Proposal[] public proposals;
+    Proposal[] private proposals;
     
     //Lista de endereço dos eleitores
-    address[] votersAddress;
+    address[]  private votersAddress;
 
     /// Create a new ballot to choose one of `proposalNames`.
     constructor() public {
@@ -158,7 +158,7 @@ contract Voting {
 
     /// @dev Computes the winning proposal taking all
     /// previous votes into account.
-    function winningProposal() public view
+    function winningProposal() private view
             returns (uint winningProposal_)
     {
         require(votingClosed, "Voting was not closed.");
