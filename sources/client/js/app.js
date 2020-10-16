@@ -1,17 +1,8 @@
+const CONTRACT_ADDRESS = "0x1a2Bc6f4BaE401D9A67Fa302C31e8351Eb939Cf0";
 
-const tableElem = document.getElementById("table-body");
-const tableVoters = document.getElementById("table-voters-body");
-const candidateOptions = document.getElementById("candidate-options");
-const voteForm = document.getElementById("vote-form");
-
-const voterArea = document.getElementById("voter-area");
-const chairPersonArea = document.getElementById("chairperson-area");
-
-var myAddress;
-var eleicao;
-var chairperson;
-const CONTRACT_ADDRESS = "0xC6ea46D3C7F727ADe47334fF539dcC50e9F7e124"; /**Voter 1 */
-
+let myAddress;
+let eleicao;
+let chairperson;
 
 const ethEnabled = () => {
 	if (window.ethereum) {
@@ -20,11 +11,11 @@ const ethEnabled = () => {
     		return true;
   	}
   	return false;
-}
+};
 
 const getMyAccounts = accounts => {
 	try {
-		if (accounts.length == 0) {
+		if (accounts.length === 0) {
 			alert("Você não tem contas habilitadas no Metamask!");
 		} else {
 			myAddress = accounts[0];
@@ -37,39 +28,27 @@ const getMyAccounts = accounts => {
 	}
 };
 
-window.addEventListener('load', async function() {
-
-	if (!ethEnabled()) {
-  		alert("Por favor, instale um navegador compatível com Ethereum ou uma extensão como o MetaMask para utilizar esse dApp!");
-	}
-	else {
-		getMyAccounts(await web3.eth.getAccounts());
-		eleicao = new web3.eth.Contract(VotingContractInterface, CONTRACT_ADDRESS);
-		redirectTo();
-	}
-});
-
 async function redirectTo() {
 	eleicao.methods.chairperson().call().then((data) => {
 		if (data === myAddress) {
-			console.log('e o presidente: ' + data);
+			console.log('É o presidente: ' + data);
 			getEleitores().then((eleitores) => {
 				populaEleitores(eleitores);
 			});
 			getEleitor(myAddress).then((eleitor) => {
-				pupulaEleitor(eleitor);
-				$(voterArea).show();
+				populaEleitor(eleitor);
+				$("#voter-area").show();
 			});
 			prepararResultadoVotacao();
-			$(chairPersonArea).show();
+			$("#chairperson-area").show();
 		} else {
-			console.log('Nao e o presidente: ' + data);
+			console.log('Não é o presidente: ' + data);
 			getCandidatos(populaCandidatos).then((candidatos) => {
 				populaCandidatosParaVoto(candidatos);
 			});
 			getEleitor(myAddress).then((eleitor) => {
-				pupulaEleitor(eleitor);
-				$(voterArea).show();
+				populaEleitor(eleitor);
+				$("#voter-area").show();
 			});
 		}
 	 });
@@ -95,7 +74,7 @@ async function getEleitores() {
 	let eleitores = [];
 	for (let i = 0; i < count; i++) {
 		let voterAddress = await eleicao.methods.getVoterAddress(i).call();
-		eleitor = await getEleitor(voterAddress);
+		let eleitor = await getEleitor(voterAddress);
 		eleitores.push(eleitor);
 	}
 	return eleitores;
@@ -104,7 +83,7 @@ async function getEleitores() {
 async function getEleitor(voterAddress) {
 	let eleitor = await eleicao.methods.getVoter(voterAddress).call().then((data) => {
 		let voter;
-		if (data[0] != '0x08c379a000000000000000000000000000000000000000000000000000000000') {
+		if (data[0] !== '0x08c379a000000000000000000000000000000000000000000000000000000000') {
 			voter = {
 				name : web3.utils.toUtf8(data[0]),
 				voted : data[1],
@@ -120,7 +99,7 @@ async function getCandidatos()
 {
 	let count = await eleicao.methods.getProposalsCount().call();
 	let proposals = [];
-	for (let i=0; i<count; i++) {
+	for (let i = 0; i < count; i++) {
 		let proposal = await eleicao.methods.getProposal(i).call().then((data)=>{
 			let proposal = {
 					name : web3.utils.toUtf8(data[0]),
@@ -137,23 +116,22 @@ function populaCandidatos(candidatos, votacaoEncerrada) {
 	candidatos.forEach((candidato, index) => {
 		console.log(candidato.name);
 		// Creates a row element.
-		const rowElem = document.createElement("tr");
+		const rowElem = $("<tr></tr>");
 
 		// Creates a cell element for the name.
-		const nameCell = document.createElement("td");
-		nameCell.innerText = candidato.name;
-		rowElem.appendChild(nameCell);
+		const nameCell = $("<td></td>");
+		nameCell.text(candidato.name);
+		rowElem.append(nameCell);
 
 		if (votacaoEncerrada) {
 			// Creates a cell element for the votes.
-			const voteCell = document.createElement("td");
-			//voteCell.id = "vote-" + candidato.name; 
-			voteCell.innerText = candidato.voteCount;
-			rowElem.appendChild(voteCell);
+			const voteCell = $("<td></td>");
+			voteCell.text(candidato.voteCount);
+			rowElem.append(voteCell);
 		}
 
 		// Adds the new row to the voting table.
-		tableElem.appendChild(rowElem);
+		$("#table-body").append(rowElem);
 	});
 }
 
@@ -161,121 +139,136 @@ function populaCandidatosParaVoto(candidatos) {
 	candidatos.forEach((candidato, index) => {
 		console.log(candidato.name);
 		// Creates an option for each candidate
-		const candidateOption = document.createElement("option");
-		candidateOption.value = index;
-		candidateOption.innerText = candidato.name;
-		candidateOptions.appendChild(candidateOption);
+		$("#candidate-options").append(new Option(candidato.name, index));
 	});
 }
 
 function populaEleitores(eleitores) {
 	eleitores.forEach((eleitor, index) => {
 		// Creates a row element.
-		const rowElem = document.createElement("tr");
+		const rowElem = $("<tr></tr>");
 
 		// Creates a cell element for the name.
-		const nameCell = document.createElement("td");
-		nameCell.innerText = eleitor.name;
-		rowElem.appendChild(nameCell);
+		const nameCell = $("<td></td>");
+		nameCell.text(eleitor.name);
+		rowElem.append(nameCell);
 
 		// Creates a cell element for the votes.
-		const votedCell = document.createElement("td");
-		votedCell.id = "vote-" + eleitor.name; 
-		votedCell.innerText = eleitor.voted && !eleitor.delegated;
-		rowElem.appendChild(votedCell);
+		const votedCell = $("<td></td>");
+		votedCell.attr("id", "vote-" + eleitor.name);
+		votedCell.text(textFromBool(eleitor.voted && !eleitor.delegated));
+		rowElem.append(votedCell);
 
 		// Creates a cell element for the delegate.
-		const delegatedCell = document.createElement("td");
-		delegatedCell.id = "delegate-" + eleitor.delegated; 
-		delegatedCell.innerText = eleitor.delegated;
-		rowElem.appendChild(delegatedCell);
+		const delegatedCell = $("<td></td>");
+		delegatedCell.attr("id", "delegate-" + eleitor.delegated);
+		delegatedCell.text(textFromBool(eleitor.delegated));
+		rowElem.append(delegatedCell);
 
 		// Adds the new row to the voting table.
-		tableVoters.appendChild(rowElem);
+		$("#table-voters-body").append(rowElem);
 	});
 }
 
-function pupulaEleitor(eleitor) {
+function populaEleitor(eleitor) {
+	$('.dapp-voter-alert').hide();
 	if (eleitor) {
 		$('#voter-name-span').html(eleitor.name);
 		if (eleitor.delegated) {
-			$('#voter-status-span').html('Direito a voto delegado');
+			$('#voting-rights-delegated').show();
 		} else if (eleitor.voted) {
-			$('#voter-status-span').html('Voto computado');
+			$('#vote-computed').show();
 		} else {
-			$('#voter-status-span').html('Voto pendente');
-			$('#delegate-vote-form').show();
-			$('#vote-form').show();
+			$('#vote-pending').show();
+			$('#delegate-vote-form-section').show();
+			$('#vote-form-section').show();
 		}
 	} else {
-		$('#voter-status-span').html('Sem direito a voto');
+		$('#no-rights-to-vote').show();
 	}
 }
 
-$("#btnVote").on('click',function(){
-	candidato = $("#candidate-options").children("option:selected").val();
+function textFromBool(boolValue) {
+	return boolValue ? 'Sim' : 'Não';
+}
 
-        eleicao.methods.vote(candidato).send({from: myAddress})
-	       .on('receipt',function(receipt) {
-			//getCandidatos(eleicao, populaCandidatos);
-			windows.location.reaload(true);
-		})
-		.on('error',function(error) {
-			alert(error.message);
-			return;     
-		});  
+$(document).ready(async function() {
+	if (!ethEnabled()) {
+		alert("Por favor, instale um navegador compatível com Ethereum ou uma extensão como o MetaMask para utilizar esse dApp!");
+	}
+	else {
+		getMyAccounts(await web3.eth.getAccounts());
+		eleicao = new web3.eth.Contract(VotingContractInterface, CONTRACT_ADDRESS);
+		redirectTo();
+	}
 
-});
+	$('#voter-name-span').html('---');
 
-$("#btn-add-proposal").on('click',function(){
-	let candidato = $("#add-proposal-input").val();
+	$("#btnVote").on('click', function(){
+		candidato = $("#candidate-options").children("option:selected").val();
 
-	eleicao.methods.addProposal(web3.utils.utf8ToHex(candidato)).send({from: myAddress})
-	.on('confirmation', function(confNumber, receipt, latestBlockHash) { 
-		location.reload();
-	})
-	.on('error',function(error) {
-		alert(error.message);
-		return;
+		eleicao.methods.vote(candidato).send({from: myAddress})
+			.on('receipt',function(receipt) {
+				//getCandidatos(eleicao, populaCandidatos);
+				windows.location.reaload(true);
+			})
+			.on('error',function(error) {
+				alert(error.message);
+				return;
+			});
+
 	});
-});
 
-$("#btn-add-voter").on('click',function(){
-	let endereco = $("#add-voter-address-input").val();
-	let nome = $("#add-voter-name-input").val();
-	let nomeHex = web3.utils.utf8ToHex(nome);
-	
-	
-	eleicao.methods.giveRightToVote(endereco, nomeHex).send({from: myAddress})
-	.on('confirmation', function(confNumber, receipt, latestBlockHash) { 
-		location.reload();
-	})
-	.on('error',function(error) {
-		alert(error.message);
-		return;
+	$("#btn-add-proposal").on('click', function(){
+		let candidato = $("#add-proposal-input").val();
+
+		eleicao.methods.addProposal(web3.utils.utf8ToHex(candidato)).send({from: myAddress})
+			.on('confirmation', function(confNumber, receipt, latestBlockHash) {
+				location.reload();
+			})
+			.on('error',function(error) {
+				alert(error.message);
+				return;
+			});
 	});
-});
 
-$("#btn-delegate-vote").on('click',function(){
-	let endereco = $("#delegate-vote-input").val();
-	
-	eleicao.methods.delegate(endereco).send({from: myAddress})
-	.on('confirmation', function(confNumber, receipt, latestBlockHash) { 
-		location.reload();
-	})
-	.on('error',function(error) {
-		alert(error.message);
-		return;
+	$("#btn-add-voter").on('click', function(){
+		let endereco = $("#add-voter-address-input").val();
+		let nome = $("#add-voter-name-input").val();
+		let nomeHex = web3.utils.utf8ToHex(nome);
+
+
+		eleicao.methods.giveRightToVote(endereco, nomeHex).send({from: myAddress})
+			.on('confirmation', function(confNumber, receipt, latestBlockHash) {
+				location.reload();
+			})
+			.on('error',function(error) {
+				alert(error.message);
+				return;
+			});
 	});
-});
 
-$("#btn-close-voting").on('click',function(){
-	eleicao.methods.closeVoting().send({from: myAddress})
-	.on('confirmation', function(confNumber, receipt, latestBlockHash) { 
-		location.reload();
-	})
-	.on('error',function(error) {
-		alert(error.message);
-		return;
+	$("#btn-delegate-vote").on('click', function(){
+		let endereco = $("#delegate-vote-input").val();
+
+		eleicao.methods.delegate(endereco).send({from: myAddress})
+			.on('confirmation', function(confNumber, receipt, latestBlockHash) {
+				location.reload();
+			})
+			.on('error',function(error) {
+				alert(error.message);
+				return;
+			});
+	});
+
+	$("#btn-close-voting").on('click',function(){
+		eleicao.methods.closeVoting().send({from: myAddress})
+			.on('confirmation', function(confNumber, receipt, latestBlockHash) {
+				location.reload();
+			})
+			.on('error',function(error) {
+				alert(error.message);
+				return;
+			});
 	});
 });

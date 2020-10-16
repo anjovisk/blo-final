@@ -1,76 +1,232 @@
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Votação</title>
-  <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-</head>
-<body class="container">
-  <div id="chairperson-area" style="display: none;">
-    <div class="table-responsive">
-      <h1>Eleitores</h1>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Eleitor</th>
-            <th>Votou</th>
-            <th>Delegou</th>
-          </tr>
-        </thead>
-        <tbody id="table-voters-body">
-        </tbody>
-      </table>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/app.css">
+    <title>Votação - Rede Ethereum</title>
+  </head>
+  <body>
+    <nav class="navbar fixed-top navbar-dark dapp-navbar">
+      <a class="navbar-brand" href="#">Votação Online - Rede Ethereum</a>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <!--Área do presidente-->
+        <section class="col-12" id="chairperson-area" style="display: none">
+          <div class="row">
+            <!--Quadro de eleitores-->
+            <div class="col-12 card section-card">
+              <div class="row">
+                <div class="col-12">
+                  <h2 class="section-title">Eleitores</h2>
+                </div>
+
+                <div class="col-12">
+                  <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                      <th>Eleitor</th>
+                      <th>Votou</th>
+                      <th>Delegou</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table-voters-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!--Quadro de candidatos-->
+            <div class="col-12 card section-card">
+              <div class="row">
+                <div class="col-12">
+                  <h2 class="section-title">Candidatos</h2>
+                </div>
+
+                <div class="col-12">
+                  <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                      <th>Candidato</th>
+                      <th>Votos</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table-body">
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="col-12" id="winner-div" style="display: none">
+                  <div class="alert alert-success" role="alert">
+                    Vencedor: <span id="winner-span"></span>!
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--Seção do presidente-->
+            <div class="col-12 card section-card">
+              <div class="row">
+                <div class="col-12">
+                  <h2 class="section-title">Seção do Presidente</h2>
+                </div>
+
+                <!--Formulário: adicionar candidato-->
+                <div class="col-12"><hr class="subsection-separator"></div>
+                <div class="col-12 subsection">
+                  <div class="row">
+                    <div class="col-12"><h3 class="subsection-title">Adicionar candidato</h3></div>
+                    <div class="col-12">
+                      <form id="add-proposal-form">
+                        <div class="row align-items-center">
+                          <div class="col-8">
+                            <input type="text" class="form-control form-text dapp-input" id="add-proposal-input" name="proposal" placeholder="Nome do candidato">
+                          </div>
+                          <div class="col-4">
+                            <button type="button" class="btn btn-primary dapp-button" id="btn-add-proposal">Adicionar</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!--Formulário: conceder direito a voto-->
+                <div class="col-12"><hr class="subsection-separator"></div>
+                <div class="col-12 subsection">
+                  <div class="row">
+                    <div class="col-12"><h3 class="subsection-title">Conceder direito a voto</h3></div>
+                    <div class="col-12">
+                      <form>
+                        <div class="row align-items-center">
+                          <div class="col-4">
+                            <input type="text" class="form-control form-text dapp-input" id="add-voter-address-input" name="voterAddress" placeholder="Endereço de destino">
+                          </div>
+                          <div class="col-4">
+                            <input type="text" class="form-control form-text dapp-input" id="add-voter-name-input" name="voterName" placeholder="Nome do eleitor">
+                          </div>
+                          <div class="col-4">
+                            <button type="button" class="btn btn-primary dapp-button" id="btn-add-voter">Conceder direito</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!--Formulário: encerrar votação-->
+                <div class="col-12"><hr class="subsection-separator"></div>
+                <div class="col-12 subsection">
+                  <div class="row">
+                    <div class="col-12"><h3 class="subsection-title">Encerrar votação</h3></div>
+                    <div class="col-12">
+                      <button type="button" class="btn btn-primary dapp-button" id="btn-close-voting">Encerrar votação</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!--Seção do eleitor-->
+        <section class="col-12" id="voter-area" style="display: none">
+          <div class="row">
+            <div class="col-12 card section-card">
+              <div class="row">
+                <div class="col-12">
+                  <h2 class="section-title">Seção do Eleitor</h2>
+                </div>
+                <div class="col-12 mt-3">
+                  <h3 class="subsection-title">Nome: <span id="voter-name-span"></span></h3>
+                </div>
+
+                <!--Alertas de status do voto-->
+                <div class="col-12 dapp-voter-alert" id="no-rights-to-vote">
+                  <div class="alert alert-danger" role="alert">
+                    Você não tem direito a voto.
+                  </div>
+                </div>
+                <div class="col-12 dapp-voter-alert" id="vote-pending">
+                  <div class="alert alert-warning" role="alert">
+                    Seu voto está pendente. Vote ou delege seu direito a voto usando o formulário abaixo.
+                  </div>
+                </div>
+                <div class="col-12 dapp-voter-alert" id="voting-rights-delegated">
+                  <div class="alert alert-success" role="alert">
+                    Direito a voto delegado.
+                  </div>
+                </div>
+                <div class="col-12 dapp-voter-alert" id="vote-computed">
+                  <div class="alert alert-success" role="alert">
+                    Voto computado.
+                  </div>
+                </div>
+
+                <!--Formulário: delegar direito a voto-->
+                <div class="col-12" id="delegate-vote-form-section" style="display: none">
+                  <div class="row">
+                    <div class="col-12"><hr class="subsection-separator"></div>
+                    <div class="col-12 subsection">
+                      <div class="row">
+                        <div class="col-12"><h3 class="subsection-title">Delegar direito a voto</h3></div>
+                        <div class="col-12">
+                          <form>
+                            <div class="row align-items-center">
+                              <div class="col-8">
+                                <input type="text" class="form-control form-text dapp-input" id="delegate-vote-input" name="voterAddress" placeholder="Endereço de destino">
+                              </div>
+                              <div class="col-4">
+                                <button type="button" class="btn btn-primary dapp-button" id="btn-delegate-vote">Delegar voto</button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!--Formulário: votar-->
+                <div class="col-12" id="vote-form-section" style="display: none">
+                  <div class="row">
+                    <div class="col-12"><hr class="subsection-separator"></div>
+                    <div class="col-12 subsection">
+                      <div class="row">
+                        <div class="col-12"><h3 class="subsection-title">Votar</h3></div>
+                        <div class="col-12">
+                          <form>
+                            <div class="row align-items-center">
+                              <div class="col-8">
+                                <select class="form-control dapp-input" id="candidate-options" name="candidate">
+                                  <option value="" disabled selected>Selecione um candidato</option>
+                                </select>
+                              </div>
+                              <div class="col-4">
+                                <button type="button" class="btn btn-primary dapp-button" id="btnVote">Votar</button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
-    <div id="winner-div" style="display: none;">
-      <h1>Vencedor:<span id="winner-span"></span></h1>
-    </div>
-    <h1>Candidatos</h1>
-    <div class="table-responsive">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Candidato</th>
-            <th>Votos</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-        </tbody>
-      </table>
-    </div>
-    <form id="add-proposal-form">
-      <label for="add-proposal-input">Adicionar candidato:</label>
-      <input type="text" id="add-proposal-input" name="proposal"></input>
-      <button type="button" class="btn btn-primary" id="btn-add-proposal">Adicionar</button>
-    </form>
-    <form>
-      <label for="add-voter-address-input">Endereço:</label>
-      <input type="text" id="add-voter-address-input" name="voterAddress"></input>
-      <label for="add-voter-name-input">Nome:</label>
-      <input type="text" id="add-voter-name-input" name="voterName"></input>
-      <button type="button" class="btn btn-primary" id="btn-add-voter">Conceder direito a voto</button>
-    </form>
-    <div>
-      <button type="button" class="btn btn-primary" id="btn-close-voting">Encerrar votação</button>
-    </div>
-  </div>
-  <div id="voter-area" style="display: none;">
-    <div>
-      <span id="voter-name-span"></span>
-      <span id="voter-status-span"></span>
-    </div>
-    <form id="delegate-vote-form" style="display: none;">
-      <label for="delegate-vote-input">Endereço:</label>
-      <input type="text" id="delegate-vote-input" name="voterAddress"></input>
-      <button type="button" class="btn btn-primary" id="btn-delegate-vote">Delegar voto</button>
-    </form>
-    <form id="vote-form" style="display: none;">
-      <select id="candidate-options" name="candidate"></select>
-      <button type="button" class="btn btn-primary" id="btnVote">Votar</button>
-    </form>
-  </div>
-</body>
-<script charset="utf-8" src="https://cdn.ethers.io/scripts/ethers-v4.min.js" type="text/javascript"> </script>
-<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-<script src="./js/VotingAbi.js"></script>
-<script src="./js/app.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <script charset="utf-8" src="https://cdn.ethers.io/scripts/ethers-v4.min.js" type="text/javascript"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="./js/VotingAbi.js"></script>
+    <script src="./js/app.js"></script>
+  </body>
 </html>
